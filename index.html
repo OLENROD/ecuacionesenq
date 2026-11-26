@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus · Ecuaciones en Q</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* VOICE: claro, motivador, de profe que acompaña; nada infantil.
+   IDEA: el pizarrón del aula: marcador azul para el enunciado, rojo para el resultado.
+   PICTURE: una ecuación "cebolla" con sus capas marcadas, que se desarma de afuera hacia adentro.
+   COLOUR and TYPE: azul marcador #1f4fd1 dominante, blanco pizarra, rojo #d92b45 para resultados; Lexend + Atkinson Hyperlegible.
+   LAYOUT: banda azul con pestañas; cada vista es una columna de tarjetas-ejercicio con corrección y paso a paso. */
+:root{color-scheme:light dark;--bg:light-dark(#f6f7fb,#0e1426);--card:light-dark(#fff,#161e36);--ink:light-dark(#141a2e,#e6eaf8);--mute:light-dark(#5a6178,#9aa3bf);--blue:light-dark(#1f4fd1,#7c9cff);--band:#1f4fd1;--red:light-dark(#d92b45,#ff6b80);--green:light-dark(#11804a,#4fd18c);--line:light-dark(#dfe3ee,#2a3352);--soft:light-dark(#eef2ff,#1c2647)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Lexend,system-ui,sans-serif;line-height:1.1;margin:0 0 .5em;text-wrap:balance}
+h1{font-size:clamp(32px,5vw,50px)}h2{font-size:clamp(26px,3.4vw,34px)}h3{font-size:20px;margin-top:1.4em}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1040px;margin:0 auto}
+header{background:var(--band);color:#fff;padding:20px max(5vw,16px) 0}
+header .wrap{display:flex;flex-direction:column;gap:12px}
+.brand{font:700 15px Lexend,sans-serif;opacity:.85}
+nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav a{flex:none;color:#fff;text-decoration:none;padding:12px 16px;border-radius:10px 10px 0 0;font:500 15px Lexend,sans-serif;opacity:.85}
+nav a.on{background:var(--bg);color:var(--ink);opacity:1}
+nav a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.view{display:none}.view.on{display:block}
+p{max-width:68ch}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(20px,4vw,48px);align-items:center}
+.lead{font-size:19px;color:var(--mute)}
+.board{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,3vw,32px);box-shadow:0 18px 40px -24px rgba(20,30,80,.45)}
+.board .eq{font-size:clamp(20px,3.4vw,30px);text-align:center;padding:18px 0}
+.layer{display:inline-flex;vertical-align:middle;align-items:center;border-radius:12px;padding:6px 8px;position:relative}
+.l1{border:2.5px solid var(--red)}.l2{border:2.5px dashed var(--blue)}.l3{border:2.5px dotted var(--green)}
+.tag{position:absolute;top:-12px;left:10px;font:700 12px Lexend,sans-serif;padding:0 6px;background:var(--card);border-radius:6px}
+.l1>.tag{color:var(--red)}.l2>.tag{color:var(--blue)}.l3>.tag{color:var(--green)}
+.legend{display:grid;gap:6px;font-size:15px;color:var(--mute);margin-top:8px}
+.legend b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:24px}
+.go{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;color:inherit;text-decoration:none}
+.go:hover{border-color:var(--blue)}
+.go strong{font:700 18px Lexend,sans-serif;display:block}
+.go span{color:var(--mute);font-size:15px}
+.meter{height:8px;border-radius:9px;background:var(--soft);margin-top:12px;overflow:hidden}.meter i{display:block;height:100%;background:var(--green);width:0;transition:width .4s}
+@media(prefers-reduced-motion:reduce){.meter i{transition:none}}
+.eq{display:block;font-size:22px;line-height:2.3;word-spacing:.08em}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.86em;line-height:1.15;margin:0 .08em}
+.fr>.nu{border-bottom:1.6px solid currentColor;padding:0 .18em}.fr>.de{padding:0 .18em}
+.rt{display:inline-flex;align-items:stretch;vertical-align:middle;position:relative;white-space:nowrap;padding-left:.15em}.rt>.sg{width:.7em;flex:none;position:relative}.sg>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.rt>.ri{position:absolute;left:0;top:.05em;font-size:.55em;line-height:1}
+.rad{border-top:1.6px solid currentColor;padding:.15em .2em .05em;display:inline-block;line-height:1.9}
+.p{font-size:1.45em;font-weight:300;line-height:1}
+i.v{font-family:Georgia,"Times New Roman",serif;font-size:1.08em}
+sup{font-size:.6em}
+.im{display:inline-flex;align-items:center;gap:.15em;vertical-align:middle;margin:0 .1em}
+.ex{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,28px);margin:18px 0}
+.exh{display:flex;gap:14px;align-items:flex-start}
+.num{flex:none;width:40px;height:40px;border-radius:50%;border:2px solid var(--blue);color:var(--blue);display:grid;place-items:center;font:700 17px Lexend,sans-serif}
+.ex .eq{color:var(--blue);font-size:clamp(20px,3vw,26px)}
+.try{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 4px}
+.try label{font-weight:700}
+input{font:inherit;font-size:17px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:min(220px,100%);min-height:44px}
+button{font:500 15px Lexend,sans-serif;min-height:44px;padding:0 16px;border-radius:10px;border:1.5px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer}
+button.ghost{background:transparent;color:var(--blue)}
+.fb{min-height:1.6em;font-weight:700;margin:6px 0}.fb.ok{color:var(--green)}.fb.bad{color:var(--red)}.fb.half{color:#c77700}
+.hint{background:var(--soft);border-radius:10px;padding:10px 14px;margin:8px 0;display:none}.hint.on{display:block}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font:500 16px Lexend,sans-serif;color:var(--blue);min-height:44px;display:flex;align-items:center}
+ol.steps{list-style:none;padding:0;margin:8px 0;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:10px 0 10px 44px;border-bottom:1px dashed var(--line)}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:12px;width:28px;height:28px;border-radius:50%;background:var(--soft);color:var(--blue);display:grid;place-items:center;font:700 14px Lexend,sans-serif}
+ol.steps .eq{font-size:20px;color:var(--ink)}
+.res{color:var(--red);font-weight:700}
+.res .eq{color:var(--red)!important}
+.ver{background:light-dark(#effaf3,#13291e);border-radius:12px;padding:12px 16px;margin-top:12px}
+.ver b{color:var(--green)}.ver .eq{font-size:18px}
+.note{font-size:15px;color:var(--mute);border-left:3px solid var(--red);padding-left:12px;margin-top:10px}
+.th{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,28px);margin:18px 0}
+.th .eq{font-size:21px}
+.box{background:var(--soft);border-radius:12px;padding:12px 16px;margin:12px 0}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:520px;margin:12px 0}td{white-space:nowrap}td:first-child,td:nth-child(2){white-space:normal}
+th,td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:middle}
+th{font:500 14px Lexend,sans-serif;color:var(--mute)}
+.top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px}
+.score{font:700 16px Lexend,sans-serif;color:var(--green)}
+ul.tips{padding-left:1.1em}ul.tips li{margin:8px 0}
+footer{color:var(--mute);font-size:14px;padding:24px max(5vw,16px) 40px;text-align:center}
+@media(max-width:700px){.hero{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){table{font-size:14px}.exh{gap:10px}.num{width:34px;height:34px}ol.steps li{padding-left:38px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand">Apoyo escolar · Matemática · 1.er año</div>
+  <nav id="nav"></nav>
+</div></header>
+
+<main>
+<section class="view band" id="v-inicio"><div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Ecuaciones en Q, paso a paso</h1>
+      <p class="lead">Teoría, las evaluaciones Tema 1 y Tema 2 resueltas, y dos evaluaciones más para practicar con corrección automática.</p>
+      <p>La idea central: una ecuación se <b>desarma como una cebolla</b>, de afuera hacia adentro, deshaciendo cada operación con su opuesta hasta dejar sola a la <i>x</i>.</p>
+    </div>
+    <div class="board" aria-label="Ecuación con sus capas marcadas">
+      <div class="eq" id="onion"></div>
+      <div class="legend">
+        <div><b style="color:var(--red)">Capa 1</b> · el 3/5 multiplica todo el paréntesis → pasa dividiendo</div>
+        <div><b style="color:var(--blue)">Capa 2</b> · el −5/6 está restando → pasa sumando</div>
+        <div><b style="color:var(--green)">Capa 3</b> · el 1/4 multiplica a x² → pasa dividiendo, y al final la raíz</div>
+      </div>
+    </div>
+  </div>
+  <div class="grid" id="cards"></div>
+</div></section>
+
+<section class="view band" id="v-teoria"><div class="wrap">
+  <h2>Teoría: ecuaciones en Q</h2>
+  <p class="lead">Todo lo que necesitás para resolver las evaluaciones, explicado de a poco.</p>
+
+  <div class="th"><h3 style="margin-top:0">1. ¿Qué es Q?</h3>
+  <p>Q es el conjunto de los <b>números racionales</b>: todos los que se pueden escribir como fracción <span class="im" data-m="{a/b}"></span> con <i>a</i> y <i>b</i> enteros y <i>b</i> ≠ 0. Incluye a los enteros (5 = 5/1), las fracciones positivas y negativas y los decimales que vienen de fracciones (0,25 = 1/4).</p>
+  <div class="box">Pensalo como una pizza: el denominador dice en cuántas porciones la cortaste y el numerador cuántas porciones tomás.</div></div>
+
+  <div class="th"><h3 style="margin-top:0">2. ¿Qué es una ecuación?</h3>
+  <p>Es una igualdad con un valor desconocido, la <b>incógnita</b> (<i>x</i>). Resolverla es encontrar el o los valores de <i>x</i> que hacen verdadera la igualdad.</p>
+  <div class="box">Una ecuación es una <b>balanza en equilibrio</b>: lo que hacés de un lado lo tenés que hacer del otro para que no se desequilibre. Eso es la <b>propiedad uniforme</b>, y de ahí sale el famoso “pasaje de términos”.</div></div>
+
+  <div class="th"><h3 style="margin-top:0">3. Pasaje de términos: cada operación pasa con su opuesta</h3>
+  <div class="scroll"><table><thead><tr><th>Si de un lado está…</th><th>Pasa al otro lado como…</th><th>Ejemplo</th></tr></thead><tbody id="tpase"></tbody></table></div>
+  <p class="note">Ojo con el signo: si un número <b>multiplica</b>, pasa dividiendo <b>con su mismo signo</b>. Si −5/8 multiplica a x, pasa dividiendo como −5/8 (no cambia a +).</p></div>
+
+  <div class="th"><h3 style="margin-top:0">4. Repaso de operaciones con fracciones</h3>
+  <div class="scroll"><table><tbody id="tops"></tbody></table></div>
+  <p>Regla de signos para multiplicar y dividir: (+)(+) = + · (−)(−) = + · (+)(−) = −. Siempre <b>simplificá</b> el resultado final.</p></div>
+
+  <div class="th"><h3 style="margin-top:0">5. Propiedad distributiva</h3>
+  <p>Un número que multiplica a un paréntesis multiplica a <b>cada</b> término de adentro:</p>
+  <div class="eq" data-m="({3/4}x + {2/5}) · {2/3} = {3/4}·{2/3}x + {2/5}·{2/3} = {1/2}x + {4/15}"></div>
+  <p>Otra opción, muchas veces más rápida: si el número multiplica a <b>todo</b> un miembro, pasalo dividiendo antes de abrir el paréntesis.</p></div>
+
+  <div class="th"><h3 style="margin-top:0">6. Potencias y raíces: ¿una solución o dos?</h3>
+  <div class="scroll"><table><thead><tr><th>Caso</th><th>Qué hacer</th><th>Soluciones</th></tr></thead><tbody id="tpot"></tbody></table></div>
+  <div class="box">¿Por qué el cuadrado da dos? Porque <span class="im" data-m="({2/3})^2 = {4/9}"></span> y también <span class="im" data-m="(−{2/3})^2 = {4/9}"></span>. En cambio, al cubo el signo se conserva: <span class="im" data-m="(−{6/7})^3 = −{216/343}"></span>.</div></div>
+
+  <div class="th"><h3 style="margin-top:0">7. Ejemplo resuelto con la estrategia de la cebolla</h3>
+  <div class="eq" style="color:var(--blue)" data-m="{2/3} · ({1/2}x − {1/4}) = {1/6}"></div>
+  <ol class="steps" id="ejteo"></ol></div>
+
+  <div class="th"><h3 style="margin-top:0">8. Verificar siempre</h3>
+  <p>Reemplazá la <i>x</i> por tu resultado en la ecuación <b>original</b> y hacé las cuentas en cada miembro. Si da lo mismo de los dos lados, la solución es correcta. Si no, buscá el error paso por paso.</p>
+  <h3>Errores más comunes</h3>
+  <ul class="tips">
+    <li>Sumar fracciones sumando numeradores y denominadores (1/2 + 1/3 ≠ 2/5). Siempre con denominador común.</li>
+    <li>Pasar un número que multiplica cambiándole el signo. Solo cambian de signo los que suman o restan.</li>
+    <li>Olvidar la solución negativa cuando aparece x².</li>
+    <li>Pasar un número que está sumando como si multiplicara al paréntesis (en 1/3 + 4/3·(…), el 1/3 se pasa primero restando).</li>
+    <li>Equivocar el signo al elevar al cubo un número negativo.</li>
+  </ul></div>
+</div></section>
+
+<section class="view band" id="v-tema1"></section>
+<section class="view band" id="v-tema2"></section>
+<section class="view band" id="v-practica-a"></section>
+<section class="view band" id="v-practica-b"></section>
+
+<section class="view band" id="v-tips"><div class="wrap">
+  <h2>Tips de estudio para primer año</h2>
+  <div class="th">
+  <ul class="tips">
+    <li><b>Un ejercicio por día vale más que diez la noche antes.</b> Resolvé 15 a 20 minutos diarios: la práctica corta y seguida fija los procedimientos.</li>
+    <li><b>Escribí cada paso en un renglón nuevo</b>, con el signo = alineado. Es más fácil encontrar errores y los profes valoran el procedimiento.</li>
+    <li><b>Primero intentá sin mirar.</b> Usá la pista solo si te trabás y el paso a paso para comparar después de resolver.</li>
+    <li><b>Armá tu machete de estudio</b> (no para la prueba): la tabla de pasaje de términos y la de potencias y raíces en una hoja.</li>
+    <li><b>Verificá siempre.</b> En una evaluación, reemplazar x lleva dos minutos y te asegura el punto.</li>
+    <li><b>Anotá tus errores.</b> Si siempre te equivocás con los signos, marcalo en rojo y revisalo al terminar cada ejercicio.</li>
+    <li><b>Agenda semanal:</b> anotá las fechas de evaluaciones y entregas de todas las materias. En el secundario hay más profesores y más fechas que en primaria.</li>
+    <li><b>Preguntá en clase.</b> Si una duda queda sin resolver, el tema siguiente se construye sobre ella.</li>
+  </ul></div>
+</div></section>
+</main>
+<footer>Enunciados transcriptos de las fotos del pizarrón (Tema 1 y Tema 2). Todos los resultados están verificados con cálculo exacto de fracciones.</footer>
+
+<script>
+{
+const M=s=>s.replace(/x/g,'§').replace(/\(/g,'<span class="p">(</span>').replace(/\)/g,'<span class="p">)</span>')
+ .replace(/\{([^{}\/]+)\/([^{}]+)\}/g,'<span class="fr"><span class="nu">$1</span><span class="de">$2</span></span>')
+ .replace(/\^(\d)/g,'<sup>$1</sup>')
+ .replace(/R([23])\[([^\]]*)\]/g,(_,n,c)=>'<span class="rt">'+(n==='3'?'<span class="ri">3</span>':'')+'<span class="sg"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 62 L22 52 L52 98 L100 0.8" fill="none" stroke="currentColor" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg></span><span class="rad">'+c+'</span></span>')
+ .replace(/§/g,'<i class="v">x</i>');
+const T=s=>s.replace(/\$(.+?)\$/g,(_,m)=>'<span class="im">'+M(m)+'</span>');
+const EQ=s=>'<div class="eq">'+M(s)+'</div>';
+
+const EVAL=[
+{id:'tema1',name:'Tema 1',sub:'Evaluación original · resuelta paso a paso',ex:[
+ {q:'{9/4}x + {3/5} = ({3/4}x + {2/5}) · {2/3}',a:['-4/21'],h:'Empezá aplicando distributiva en el miembro derecho: multiplicá 2/3 por cada término del paréntesis.',
+  s:[['Distributiva a la derecha: $\{3/4}·{2/3} = {6/12} = {1/2}$ y $\{2/5}·{2/3} = {4/15}$.','{9/4}x + {3/5} = {1/2}x + {4/15}'],
+     ['Agrupamos: términos con x a la izquierda y números a la derecha. El $\{1/2}x$ pasa restando y el $\{3/5}$ pasa restando.','{9/4}x − {1/2}x = {4/15} − {3/5}'],
+     ['Izquierda con denominador 4: $\{9/4} − {2/4} = {7/4}$. Derecha con denominador 15: $\{4/15} − {9/15} = −{5/15} = −{1/3}$.','{7/4}x = −{1/3}'],
+     ['El $\{7/4}$ multiplica a x: pasa dividiendo, es decir, multiplicamos por su inverso $\{4/7}$.','x = −{1/3} · {4/7}'],
+     ['Resultado:','x = −{4/21}']],
+  v:['{9/4}·(−{4/21}) + {3/5} = −{3/7} + {3/5} = {6/35}','({3/4}·(−{4/21}) + {2/5})·{2/3} = (−{1/7} + {2/5})·{2/3} = {9/35}·{2/3} = {6/35} ✓']},
+ {q:'{3/5} · ({1/4}x^2 − {5/6}) = −{13/30}',a:['2/3','-2/3'],h:'El 3/5 multiplica a todo el paréntesis: pasalo dividiendo antes de tocar lo de adentro. Y recordá que x² tiene dos soluciones.',
+  s:[['Capa 1: el $\{3/5}$ multiplica a todo el paréntesis, así que pasa dividiendo (multiplicamos por $\{5/3}$).','{1/4}x^2 − {5/6} = −{13/30} · {5/3}'],
+     ['Calculamos: $−{13/30}·{5/3} = −{65/90} = −{13/18}$.','{1/4}x^2 − {5/6} = −{13/18}'],
+     ['Capa 2: el $−{5/6}$ pasa sumando. Con denominador 18: $−{13/18} + {15/18} = {2/18} = {1/9}$.','{1/4}x^2 = {1/9}'],
+     ['Capa 3: el $\{1/4}$ pasa dividiendo (multiplicamos por 4).','x^2 = {4/9}'],
+     ['El cuadrado pasa como raíz cuadrada: hay <b>dos</b> soluciones.','x = ±R2[{4/9}] = ±{2/3}']],
+  v:['({2/3})^2 = (−{2/3})^2 = {4/9}','{3/5}·({1/4}·{4/9} − {5/6}) = {3/5}·({2/18} − {15/18}) = {3/5}·(−{13/18}) = −{13/30} ✓'],
+  n:'En el pizarrón figura x = 2/3. La solución −2/3 también es correcta, porque al elevarla al cuadrado da el mismo 4/9.'},
+ {q:'R3[x] − {17/15} · (−{3/2}) = {59/70}',a:['-216/343'],h:'Primero resolvé la multiplicación 17/15 · (−3/2) y fijate bien el signo que queda delante.',
+  s:[['Resolvemos la multiplicación: $\{17/15}·(−{3/2}) = −{51/30} = −{17/10}$. Como adelante hay un menos: $−(−{17/10}) = +{17/10}$.','R3[x] + {17/10} = {59/70}'],
+     ['El $\{17/10}$ pasa restando.','R3[x] = {59/70} − {17/10}'],
+     ['Denominador común 70: $\{59/70} − {119/70} = −{60/70} = −{6/7}$.','R3[x] = −{6/7}'],
+     ['La raíz cúbica pasa como potencia al cubo.','x = (−{6/7})^3'],
+     ['Exponente impar: el signo negativo se conserva. $6^3 = 216$ y $7^3 = 343$.','x = −{216/343}']],
+  v:['R3[−{216/343}] = −{6/7}','−{6/7} + {17/10} = −{60/70} + {119/70} = {59/70} ✓']},
+ {q:'R2[{1/5}x − {3/5}] = {1/4}',a:['53/16'],h:'La raíz cuadrada que envuelve todo pasa al otro lado como potencia al cuadrado.',
+  s:[['La raíz cuadrada pasa como cuadrado.','{1/5}x − {3/5} = ({1/4})^2'],
+     ['Calculamos el cuadrado.','{1/5}x − {3/5} = {1/16}'],
+     ['El $−{3/5}$ pasa sumando. Denominador 80: $\{5/80} + {48/80} = {53/80}$.','{1/5}x = {53/80}'],
+     ['El $\{1/5}$ pasa dividiendo (multiplicamos por 5): $\{53/80}·5 = {265/80} = {53/16}$.','x = {53/16}']],
+  v:['{1/5}·{53/16} − {3/5} = {53/80} − {48/80} = {5/80} = {1/16}','R2[{1/16}] = {1/4} ✓']}
+]},
+{id:'tema2',name:'Tema 2',sub:'Evaluación original · resuelta paso a paso',ex:[
+ {q:'{2/5}x^3 + {1/4} = {33/32}',a:['5/4'],h:'Despejá x³ primero (el 1/4 pasa restando, el 2/5 pasa dividiendo) y al final aplicá raíz cúbica.',
+  s:[['El $\{1/4}$ pasa restando.','{2/5}x^3 = {33/32} − {1/4}'],
+     ['Denominador 32: $\{33/32} − {8/32} = {25/32}$.','{2/5}x^3 = {25/32}'],
+     ['El $\{2/5}$ pasa dividiendo (multiplicamos por $\{5/2}$): $\{25/32}·{5/2} = {125/64}$.','x^3 = {125/64}'],
+     ['El cubo pasa como raíz cúbica: una sola solución. $5^3 = 125$ y $4^3 = 64$.','x = R3[{125/64}] = {5/4}']],
+  v:['({5/4})^3 = {125/64}','{2/5}·{125/64} + {1/4} = {25/32} + {8/32} = {33/32} ✓']},
+ {q:'R3[{3/8} − {5/8}x] = −{5/2}',a:['128/5'],h:'La raíz cúbica pasa como cubo, y el cubo de un negativo da negativo.',
+  s:[['La raíz cúbica pasa como potencia al cubo.','{3/8} − {5/8}x = (−{5/2})^3'],
+     ['Exponente impar, el signo se mantiene: $(−{5/2})^3 = −{125/8}$.','{3/8} − {5/8}x = −{125/8}'],
+     ['El $\{3/8}$ pasa restando.','−{5/8}x = −{125/8} − {3/8} = −{128/8} = −16'],
+     ['El $−{5/8}$ multiplica: pasa dividiendo <b>con su signo</b>. $−16·(−{8/5}) = {128/5}$.','x = {128/5}']],
+  v:['{5/8}·{128/5} = 16','{3/8} − 16 = {3/8} − {128/8} = −{125/8}','R3[−{125/8}] = −{5/2} ✓'],
+  n:'En la foto el resultado se lee parecido a 28/5; el valor correcto, verificado, es 128/5.'},
+ {q:'{9/4} · ({5/8}x^2 − {3/2}) = −{27/20}',a:['6/5','-6/5'],h:'Pasá el 9/4 dividiendo antes de abrir el paréntesis. Hay x²: buscá dos soluciones.',
+  s:[['El $\{9/4}$ multiplica a todo el paréntesis: pasa dividiendo (por $\{4/9}$). $−{27/20}·{4/9} = −{108/180} = −{3/5}$.','{5/8}x^2 − {3/2} = −{3/5}'],
+     ['El $−{3/2}$ pasa sumando. Denominador 10: $−{6/10} + {15/10} = {9/10}$.','{5/8}x^2 = {9/10}'],
+     ['El $\{5/8}$ pasa dividiendo (por $\{8/5}$): $\{9/10}·{8/5} = {72/50} = {36/25}$.','x^2 = {36/25}'],
+     ['Raíz cuadrada: dos soluciones.','x = ±R2[{36/25}] = ±{6/5}']],
+  v:['{5/8}·{36/25} = {9/10}','{9/10} − {15/10} = −{3/5}','{9/4}·(−{3/5}) = −{27/20} ✓']},
+ {q:'{1/3} + {4/3} · (−{5/8}x + {9/8}) = {5/4}',a:['7/10'],h:'El 1/3 está sumando y no multiplica al paréntesis: pasalo restando primero.',
+  s:[['Capa externa: el $\{1/3}$ suma, pasa restando.','{4/3} · (−{5/8}x + {9/8}) = {5/4} − {1/3}'],
+     ['Denominador 12: $\{15/12} − {4/12} = {11/12}$.','{4/3} · (−{5/8}x + {9/8}) = {11/12}'],
+     ['El $\{4/3}$ pasa dividiendo (por $\{3/4}$): $\{11/12}·{3/4} = {33/48} = {11/16}$.','−{5/8}x + {9/8} = {11/16}'],
+     ['El $\{9/8}$ pasa restando: $\{11/16} − {18/16} = −{7/16}$.','−{5/8}x = −{7/16}'],
+     ['El $−{5/8}$ pasa dividiendo con su signo: $−{7/16}·(−{8/5}) = {56/80} = {7/10}$.','x = {7/10}']],
+  v:['−{5/8}·{7/10} + {9/8} = −{7/16} + {18/16} = {11/16}','{1/3} + {4/3}·{11/16} = {4/12} + {11/12} = {15/12} = {5/4} ✓']}
+]},
+{id:'practica-a',name:'Práctica A',sub:'Mismo formato que el Tema 1 · intentalo antes de mirar',ex:[
+ {q:'{5/6}x − {1/2} = ({1/3}x + {3/4}) · {3/2}',a:['39/8'],h:'Distributiva a la derecha, después agrupá las x de un lado.',
+  s:[['Distributiva: $\{1/3}·{3/2} = {1/2}$ y $\{3/4}·{3/2} = {9/8}$.','{5/6}x − {1/2} = {1/2}x + {9/8}'],
+     ['Agrupamos.','{5/6}x − {1/2}x = {9/8} + {1/2}'],
+     ['$\{5/6} − {3/6} = {2/6} = {1/3}$ y $\{9/8} + {4/8} = {13/8}$.','{1/3}x = {13/8}'],
+     ['El $\{1/3}$ pasa dividiendo (multiplicamos por 3).','x = {39/8}']],
+  v:['{5/6}·{39/8} − {1/2} = {65/16} − {8/16} = {57/16}','({1/3}·{39/8} + {3/4})·{3/2} = {19/8}·{3/2} = {57/16} ✓']},
+ {q:'{2/3} · ({4/9}x^2 + {1/2}) = {1/2}',a:['3/4','-3/4'],h:'El 2/3 pasa dividiendo primero. No te olvides de las dos soluciones.',
+  s:[['El $\{2/3}$ pasa dividiendo: $\{1/2}·{3/2} = {3/4}$.','{4/9}x^2 + {1/2} = {3/4}'],
+     ['El $\{1/2}$ pasa restando: $\{3/4} − {2/4} = {1/4}$.','{4/9}x^2 = {1/4}'],
+     ['El $\{4/9}$ pasa dividiendo: $\{1/4}·{9/4} = {9/16}$.','x^2 = {9/16}'],
+     ['Raíz cuadrada: dos soluciones.','x = ±{3/4}']],
+  v:['{4/9}·{9/16} + {1/2} = {1/4} + {2/4} = {3/4}','{2/3}·{3/4} = {1/2} ✓']},
+ {q:'R3[x] + {5/6} · (−{2/5}) = −{11/6}',a:['-27/8'],h:'Resolvé la multiplicación primero; después aislá la raíz cúbica.',
+  s:[['$\{5/6}·(−{2/5}) = −{10/30} = −{1/3}$.','R3[x] − {1/3} = −{11/6}'],
+     ['El $−{1/3}$ pasa sumando: $−{11/6} + {2/6} = −{9/6} = −{3/2}$.','R3[x] = −{3/2}'],
+     ['La raíz cúbica pasa como cubo; el signo se conserva.','x = (−{3/2})^3 = −{27/8}']],
+  v:['R3[−{27/8}] = −{3/2}','−{3/2} − {1/3} = −{9/6} − {2/6} = −{11/6} ✓']},
+ {q:'R2[{3/4}x − {1/2}] = {3/4}',a:['17/12'],h:'Elevá al cuadrado los dos miembros para sacar la raíz.',
+  s:[['La raíz cuadrada pasa como cuadrado: $(\{3/4})^2 = {9/16}$.','{3/4}x − {1/2} = {9/16}'],
+     ['El $−{1/2}$ pasa sumando: $\{9/16} + {8/16} = {17/16}$.','{3/4}x = {17/16}'],
+     ['El $\{3/4}$ pasa dividiendo: $\{17/16}·{4/3} = {68/48} = {17/12}$.','x = {17/12}']],
+  v:['{3/4}·{17/12} − {1/2} = {17/16} − {8/16} = {9/16}','R2[{9/16}] = {3/4} ✓']}
+]},
+{id:'practica-b',name:'Práctica B',sub:'Mismo formato que el Tema 2 · intentalo antes de mirar',ex:[
+ {q:'{3/4}x^3 + {1/6} = −{1/18}',a:['-2/3'],h:'Despejá x³. La raíz cúbica de un número negativo existe y es negativa.',
+  s:[['El $\{1/6}$ pasa restando. Denominador 18: $−{1/18} − {3/18} = −{4/18} = −{2/9}$.','{3/4}x^3 = −{2/9}'],
+     ['El $\{3/4}$ pasa dividiendo: $−{2/9}·{4/3} = −{8/27}$.','x^3 = −{8/27}'],
+     ['Raíz cúbica: una sola solución, negativa.','x = R3[−{8/27}] = −{2/3}']],
+  v:['(−{2/3})^3 = −{8/27}','{3/4}·(−{8/27}) + {1/6} = −{2/9} + {1/6} = −{4/18} + {3/18} = −{1/18} ✓']},
+ {q:'R3[{1/2}x − {3/4}] = −{1/2}',a:['5/4'],h:'Elevá al cubo los dos miembros; cuidado con el signo.',
+  s:[['La raíz cúbica pasa como cubo: $(−{1/2})^3 = −{1/8}$.','{1/2}x − {3/4} = −{1/8}'],
+     ['El $−{3/4}$ pasa sumando: $−{1/8} + {6/8} = {5/8}$.','{1/2}x = {5/8}'],
+     ['El $\{1/2}$ pasa dividiendo (multiplicamos por 2).','x = {5/4}']],
+  v:['{1/2}·{5/4} − {3/4} = {5/8} − {6/8} = −{1/8}','R3[−{1/8}] = −{1/2} ✓']},
+ {q:'{5/3} · ({2/5}x^2 − {1/4}) = {15/4}',a:['5/2','-5/2'],h:'Pasá el 5/3 dividiendo y buscá las dos soluciones de x².',
+  s:[['El $\{5/3}$ pasa dividiendo: $\{15/4}·{3/5} = {45/20} = {9/4}$.','{2/5}x^2 − {1/4} = {9/4}'],
+     ['El $−{1/4}$ pasa sumando: $\{9/4} + {1/4} = {10/4} = {5/2}$.','{2/5}x^2 = {5/2}'],
+     ['El $\{2/5}$ pasa dividiendo: $\{5/2}·{5/2} = {25/4}$.','x^2 = {25/4}'],
+     ['Raíz cuadrada: dos soluciones.','x = ±{5/2}']],
+  v:['{2/5}·{25/4} − {1/4} = {10/4} − {1/4} = {9/4}','{5/3}·{9/4} = {15/4} ✓']},
+ {q:'{2/5} − {3/4} · ({2/3}x − {1/2}) = {1/10}',a:['27/20'],h:'El 2/5 pasa primero. El signo menos viaja pegado al 3/4.',
+  s:[['El $\{2/5}$ pasa restando: $\{1/10} − {4/10} = −{3/10}$.','−{3/4} · ({2/3}x − {1/2}) = −{3/10}'],
+     ['El $−{3/4}$ pasa dividiendo con su signo: $−{3/10}·(−{4/3}) = {12/30} = {2/5}$.','{2/3}x − {1/2} = {2/5}'],
+     ['El $−{1/2}$ pasa sumando: $\{4/10} + {5/10} = {9/10}$.','{2/3}x = {9/10}'],
+     ['El $\{2/3}$ pasa dividiendo: $\{9/10}·{3/2} = {27/20}$.','x = {27/20}']],
+  v:['{2/3}·{27/20} − {1/2} = {9/10} − {5/10} = {2/5}','{2/5} − {3/4}·{2/5} = {4/10} − {3/10} = {1/10} ✓']}
+]}];
+
+const VIEWS=[['inicio','Inicio'],['teoria','Teoría'],['tema1','Tema 1'],['tema2','Tema 2'],['practica-a','Práctica A'],['practica-b','Práctica B'],['tips','Tips de estudio']];
+const nav=document.getElementById('nav');
+nav.innerHTML=VIEWS.map(([k,t])=>`<a href="#${k}" data-k="${k}">${t}</a>`).join('');
+
+let store={};try{store=JSON.parse(localStorage.getItem('eqQ')||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem('eqQ',JSON.stringify(store))}catch(e){}};
+
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1};
+const norm=(n,d)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d);return (n/g)+'/'+(d/g)};
+const parse=s=>{s=s.replace(/[−–]/g,'-').replace(/\s+/g,'');const pm=/±|\+-|\+\/-|-\+/.test(s);s=s.replace(/±|\+\/-|\+-|-\+/g,'');
+ const out=new Set();(s.match(/-?\d+(?:\/-?\d+)?/g)||[]).forEach(t=>{const[n,d='1']=t.split('/');if(+d===0)return;const v=norm(+n,+d);out.add(v);if(pm)out.add(norm(-n,+d))});return out};
+
+for(const ev of EVAL){
+ const el=document.getElementById('v-'+ev.id);
+ el.innerHTML=`<div class="wrap"><div class="top"><div><h2>${ev.name}</h2><p class="lead" style="margin:0">${ev.sub}</p></div><div class="score" id="sc-${ev.id}"></div></div>
+ <p>Escribí tu resultado como fracción (por ejemplo <b>-4/21</b>). Si hay dos soluciones, escribí las dos (<b>2/3; -2/3</b>) o usá <b>±2/3</b>.</p>`+
+ ev.ex.map((e,i)=>{const k=ev.id+'-'+i;return `<article class="ex" id="${k}">
+  <div class="exh"><div class="num">${i+1}</div><div style="flex:1">${EQ(e.q)}</div></div>
+  <form class="try" data-k="${k}"><label for="in-${k}">x =</label><input id="in-${k}" autocomplete="off" inputmode="text" placeholder="tu resultado"><button type="submit">Corregir</button><button type="button" class="ghost" data-h="${k}">Pista</button></form>
+  <div class="fb" id="fb-${k}" aria-live="polite"></div>
+  <div class="hint" id="h-${k}">${T(e.h)}</div>
+  <details><summary>Ver resolución paso a paso</summary>
+   <ol class="steps">${e.s.map(([t,m],j)=>`<li${j===e.s.length-1?' class="res"':''}><div>${T(t)}</div>${EQ(m)}</li>`).join('')}</ol>
+   <div class="ver"><b>Verificación</b>${e.v.map(EQ).join('')}</div>
+   ${e.n?`<p class="note">${e.n}</p>`:''}
+  </details></article>`}).join('')+'</div>';
+}
+
+const total=id=>{const ev=EVAL.find(e=>e.id===id);return ev.ex.filter((_,i)=>store[id+'-'+i]).length};
+const refresh=()=>{for(const ev of EVAL){const n=total(ev.id);const s=document.getElementById('sc-'+ev.id);if(s)s.textContent=`Correctos: ${n} de ${ev.ex.length}`;const m=document.getElementById('m-'+ev.id);if(m)m.style.width=(n/ev.ex.length*100)+'%'}};
+
+document.addEventListener('submit',ev=>{const f=ev.target.closest('form.try');if(!f)return;ev.preventDefault();
+ const k=f.dataset.k;const[id,i]=[k.slice(0,k.lastIndexOf('-')),+k.slice(k.lastIndexOf('-')+1)];
+ const ex=EVAL.find(e=>e.id===id).ex[i];const want=new Set(ex.a.map(a=>{const[n,d]=a.split('/');return norm(+n,+d)}));
+ const got=parse(document.getElementById('in-'+k).value);const fb=document.getElementById('fb-'+k);
+ if(!got.size){fb.className='fb bad';fb.textContent='Escribí un número o una fracción.';return}
+ const allIn=[...got].every(g=>want.has(g));
+ if(allIn&&got.size===want.size){fb.className='fb ok';fb.textContent='¡Correcto! Muy bien. Compará tu procedimiento con el paso a paso.';store[k]=1;save();refresh()}
+ else if(allIn){fb.className='fb half';fb.textContent='¡Vas bien! Pero falta una solución: cuando aparece x², hay dos.'}
+ else{fb.className='fb bad';fb.textContent='Todavía no. Revisá signos y denominadores comunes, o pedí la pista.'}
+});
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-h]');if(b)document.getElementById('h-'+b.dataset.h).classList.toggle('on')});
+
+document.getElementById('cards').innerHTML=[['teoria','Teoría','Q, pasaje de términos, potencias y raíces'],...EVAL.map(e=>[e.id,e.name,e.sub]),['tips','Tips de estudio','Cómo organizarte en primer año']]
+ .map(([k,t,s])=>`<a class="go" href="#${k}"><strong>${t}</strong><span>${s}</span>${EVAL.some(e=>e.id===k)?`<div class="meter"><i id="m-${k}"></i></div>`:''}</a>`).join('');
+
+document.getElementById('onion').innerHTML=`<span class="layer l1"><span class="tag">1</span>${M('{3/5} ·')}&nbsp;<span class="layer l2"><span class="tag">2</span>${M('(')}<span class="layer l3"><span class="tag">3</span>${M('{1/4}x^2')}</span>&nbsp;${M('− {5/6})')}</span></span>&nbsp;${M('= −{13/30}')}`;
+
+document.getElementById('tpase').innerHTML=[['sumando  $+{a/b}$','restando  $−{a/b}$','$x + {1/4} = {3/4}  →  x = {3/4} − {1/4}$'],['restando  $−{a/b}$','sumando  $+{a/b}$','$x − {2/5} = {1/5}  →  x = {1/5} + {2/5}$'],['multiplicando  $·{a/b}$','dividiendo (por el inverso $\{b/a}$)','${2/3}x = {4/9}  →  x = {4/9}·{3/2}$'],['dividiendo  $:{a/b}$','multiplicando  $·{a/b}$','$x : {1/2} = 6  →  x = 6·{1/2}$'],['al cuadrado  $x^2$','raíz cuadrada  $±R2[ ]$','$x^2 = {9/4}  →  x = ±{3/2}$'],['al cubo  $x^3$','raíz cúbica  $R3[ ]$','$x^3 = −{1/8}  →  x = −{1/2}$'],['raíz cuadrada  $R2[ ]$','al cuadrado','$R2[x] = {2/3}  →  x = {4/9}$'],['raíz cúbica  $R3[ ]$','al cubo','$R3[x] = −{1/2}  →  x = −{1/8}$']]
+ .map(r=>'<tr>'+r.map(c=>`<td>${T(c)}</td>`).join('')+'</tr>').join('');
+document.getElementById('tops').innerHTML=[['Suma y resta','Denominador común (mcm)','${1/4} + {2/3} = {3/12} + {8/12} = {11/12}$'],['Multiplicación','Numerador por numerador, denominador por denominador','${3/4}·{2/3} = {6/12} = {1/2}$'],['División','Multiplicar por el inverso','${2/5} : {4/3} = {2/5}·{3/4} = {3/10}$'],['Potencia','Se eleva numerador y denominador','$(−{2/3})^3 = −{8/27}$'],['Raíz','Raíz del numerador y del denominador','$R2[{25/36}] = {5/6}$']]
+ .map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${T(r[2])}</td></tr>`).join('');
+document.getElementById('tpot').innerHTML=[['$x^2 = a$ con a positivo','Raíz cuadrada','Dos: $x = ±R2[a]$'],['$x^2 = a$ con a negativo','—','Ninguna (ningún número al cuadrado da negativo)'],['$x^3 = a$','Raíz cúbica','Una, con el mismo signo que a'],['$R2[algo] = b$','Elevar al cuadrado','b debe ser positivo o cero'],['$R3[algo] = b$','Elevar al cubo','b puede ser negativo']]
+ .map(r=>'<tr>'+r.map(c=>`<td>${T(c.replace('algo','A'))}</td>`).join('')+'</tr>').join('');
+document.getElementById('ejteo').innerHTML=[['Capa externa: el $\{2/3}$ multiplica a todo el paréntesis, pasa dividiendo (por $\{3/2}$).','{1/2}x − {1/4} = {1/6}·{3/2} = {1/4}'],['Capa siguiente: el $−{1/4}$ pasa sumando.','{1/2}x = {1/4} + {1/4} = {1/2}'],['Última capa: el $\{1/2}$ pasa dividiendo (por 2).','x = 1'],['Verificación: $\{2/3}·({1/2}·1 − {1/4}) = {2/3}·{1/4} = {1/6}$ ✓','x = 1']]
+ .map(([t,m],j,a)=>`<li${j===a.length-1?' class="res"':''}><div>${T(t)}</div>${j<a.length-1?EQ(m):''}</li>`).join('');
+document.querySelectorAll('[data-m]').forEach(n=>n.innerHTML=M(n.dataset.m));
+
+const show=()=>{let h=location.hash.slice(1);if(!VIEWS.some(v=>v[0]===h))h='inicio';
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+h));
+ nav.querySelectorAll('a').forEach(a=>a.classList.toggle('on',a.dataset.k===h));window.scrollTo(0,0)};
+window.addEventListener('hashchange',show);show();refresh();
+}
+</script>
+</body>
+</html>
